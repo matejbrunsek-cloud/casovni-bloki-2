@@ -23,22 +23,38 @@ interface BlockInstance {
   end: Date;
 }
 
+// ---------- CENE BLOKOV ----------
+
+const BLOCK_PRICES: Record<number, number> = {
+  1: 1.71,
+  2: 0.91,
+  3: 0.16,
+  4: 0.004,
+  5: 0,
+};
+
+function formatPrice(block: number): string {
+  const price = BLOCK_PRICES[block] ?? 0;
+  if (price === 0) return "0 €";
+  return price.toFixed(3).replace(".", ",") + " €";
+}
+
 // ---------- SEZONA & TIP DNEVA ----------
 
 function getSeason(date: Date): Season {
-  const month = date.getMonth() + 1;
+  const month = date.getMonth() + 1; // 1–12
   if (month === 11 || month === 12 || month === 1 || month === 2) {
-    return "VISOKA";
+    return "VISOKA"; // november–februar
   }
-  return "NIZKA";
+  return "NIZKA"; // marec–oktober
 }
 
 function getDayType(date: Date): DayType {
-  const day = date.getDay();
+  const day = date.getDay(); // 0 nedelja, 6 sobota
   return day === 0 || day === 6 ? "DELA_PROST_DAN" : "DELOVNI_DAN";
 }
 
-// ---------- URNIKI ----------
+// ---------- DEFINICIJA URNIH BLOKOV ----------
 
 const SCHEDULE: Record<Season, Record<DayType, BlockInterval[]>> = {
   VISOKA: {
@@ -86,6 +102,7 @@ const SCHEDULE: Record<Season, Record<DayType, BlockInterval[]>> = {
 function getDailySchedule(date: Date): DailySchedule {
   const season = getSeason(date);
   const dayType = getDayType(date);
+
   return {
     season,
     dayType,
@@ -197,7 +214,7 @@ function translateDayType(dayType: DayType): string {
   return dayType === "DELOVNI_DAN" ? "Delovni dan" : "Dela prost dan";
 }
 
-// ---------- TABELA ZA EN DAN (SIVO OZADJE, BELO BESEDILO) ----------
+// ---------- TABELA ZA EN DAN (S CENO BLOKA) ----------
 
 const DaySchedule: React.FC<{ date: Date }> = ({ date }) => {
   const schedule = getDailySchedule(date);
@@ -234,6 +251,7 @@ const DaySchedule: React.FC<{ date: Date }> = ({ date }) => {
             <th style={{ textAlign: "left", paddingBottom: "4px" }}>Blok</th>
             <th style={{ textAlign: "left", paddingBottom: "4px" }}>Od</th>
             <th style={{ textAlign: "left", paddingBottom: "4px" }}>Do</th>
+            <th style={{ textAlign: "left", paddingBottom: "4px" }}>Cena</th>
           </tr>
         </thead>
 
@@ -246,6 +264,9 @@ const DaySchedule: React.FC<{ date: Date }> = ({ date }) => {
               </td>
               <td style={{ padding: "4px 0" }}>
                 {interval.endHour.toString().padStart(2, "0")}:00
+              </td>
+              <td style={{ padding: "4px 0" }}>
+                {formatPrice(interval.block)}
               </td>
             </tr>
           ))}
@@ -297,7 +318,7 @@ const App: React.FC = () => {
           borderRadius: "16px",
           padding: "16px",
           width: "100%",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
         }}
       >
         <h1
@@ -339,6 +360,9 @@ const App: React.FC = () => {
             >
               Blok {current.block}
             </div>
+            <div style={{ fontSize: "14px", marginBottom: "4px" }}>
+              Cena: {formatPrice(current.block)}
+            </div>
             <div style={{ fontSize: "14px" }}>
               {formatTime(current.start)} – {formatTime(current.end)}
             </div>
@@ -368,6 +392,9 @@ const App: React.FC = () => {
               }}
             >
               Blok {next.block}
+            </div>
+            <div style={{ fontSize: "14px", marginBottom: "4px" }}>
+              Cena: {formatPrice(next.block)}
             </div>
             <div style={{ fontSize: "14px" }}>
               {formatTime(next.start)} – {formatTime(next.end)}
