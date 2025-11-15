@@ -1,0 +1,21 @@
+/* Globalni reset za lep mobilni izgled */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: #f3f4f6; /* svetlo sivo ozadje za celo stran */
+}
+
+/* Root naj bo čez cel ekran, brez paddinga, centrirano */
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
